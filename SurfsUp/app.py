@@ -80,7 +80,9 @@ session.close()
 def precipitation():
     #create session from Python to the DB
     session = Session(engine)
-    #query to get all date.prcp data
+
+    #query to get all date&prcp data
+    #use date from query outside app.route to capture the date 12mths from recent
     results = session.query(measurement.date, measurement.prcp).filter(measurement.date >= recent_year).all()
 
     #create list for display
@@ -102,6 +104,7 @@ def precipitation():
 def stations():
     #create session from Python to the DB
     session = Session(engine)
+
     #query to get all station details
     results = session.query(Station.id, Station.station, Station.name, Station.latitude, Station.longitude, Station.elevation).all()
 
@@ -136,10 +139,12 @@ def tobs():
     most_active_station = station_count[0][0]
     
     #query to retrieve date and temperature for one year from most recent for the most active station
+    #use date from query outside app.route to capture the date 12mths from recent 
     results = session.query(measurement.date, measurement.tobs).\
         filter(and_(measurement.date >= recent_year, measurement.station == most_active_station)).all()
     
-    #save the query results as a list to return, including the station detail
+    #save the query results as a list to return
+    #although not required, include the station detail for visibility
     tobs = [{"Station": most_active_station, "Date": result[0], "Temperature": result[1]} for result in results]
     
     session.close()
@@ -164,7 +169,8 @@ def startdate(start):
     #query on date range to capture above function details
     function_results = session.query(*functions).filter(measurement.date >= startdate).all()
 
-    #query results formatted for viewing including start date
+    #query results formatted for viewing
+    #although not required start date included as first dictionary item for visibility
     temp_results = [{"1.Start Date": startdate, "Min": temp_results[0], "Avg": temp_results[1], "Max": temp_results[2]} for temp_results in function_results]
     
     session.close()
@@ -190,7 +196,8 @@ def startend(start,end):
     #query on date range to capture above function details
     function_results = session.query(*functions).filter(and_(measurement.date >= firstdate, measurement.date <= lastdate)).all()
 
-    #query results formatted for viewing including start/end date
+    #query results formatted for viewing
+    #although not required start & end date included as first & second dictionary item for visibility
     temp_results = [{"1. Start Date": firstdate, "2. End Date": lastdate,"Min": temp_results[0], "Avg": temp_results[1], "Max": temp_results[2]} for temp_results in function_results]
 
     session.close()
